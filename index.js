@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 5000;
 require("./config/database.js");
 const userRoutes = require("./Routes/userRoutes");
 const productRoutes = require("./Routes/productRoutes");
+const verifyRoutes = require("./Routes/verifyRoutes");
 const {
   notFoundRoutes,
   errorHandler,
@@ -18,13 +19,19 @@ if (!process.env.PORT) {
   );
 }
 
-app.use(cors());
+const corsOptions = {
+  origin: "http://localhost:5173",
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api", verifyRoutes);
 
 app.use(notFoundRoutes);
 app.use(errorHandler);

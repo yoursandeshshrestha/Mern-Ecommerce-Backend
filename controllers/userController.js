@@ -42,22 +42,18 @@ const registerUser = async (req, res) => {
     });
 
     generateToken(res, newUser);
-    res
-      .status(201)
-      .json({
-        success: true,
-        message: "Registration successful",
-        id: newUser._id,
-      });
+    res.status(201).json({
+      success: true,
+      message: "Registration successful",
+      id: newUser._id,
+    });
   } catch (error) {
     console.error("Error registering user:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Registration failed, please try again later",
-        error: error.message,
-      });
+    res.status(500).json({
+      success: false,
+      message: "Registration failed, please try again later",
+      error: error.message,
+    });
   }
 };
 
@@ -84,12 +80,17 @@ const loginUser = async (req, res) => {
         .json({ success: false, message: "Invalid credentials" });
     }
 
-    generateToken(res, user);
+    const token = generateToken(res, user);
 
-    const { _id, username, email: userEmail } = user;
-    res
-      .status(200)
-      .json({ success: true, id: _id, username, email: userEmail });
+    const { _id, username, email: userEmail, isAdmin } = user;
+    res.status(200).json({
+      success: true,
+      id: _id,
+      username,
+      email: userEmail,
+      isAdmin,
+      token,
+    });
   } catch (error) {
     console.error("Error logging in:", error);
     res.status(500).json({

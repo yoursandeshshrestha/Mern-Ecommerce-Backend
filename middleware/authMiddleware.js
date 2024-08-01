@@ -2,7 +2,15 @@ const jwt = require("jsonwebtoken");
 const userModel = require("../models/userModel");
 
 const Authenticate = async (req, res, next) => {
-  const token = req.cookies.token;
+  let token;
+  if (req.cookies.token) {
+    token = req.cookies.token;
+  } else if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
 
   if (token) {
     try {

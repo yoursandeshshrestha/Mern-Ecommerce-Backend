@@ -10,8 +10,15 @@ const {
   getSingleProduct,
   getCategoryProduct,
 } = require("../controllers/productController");
+const upload = require("../config/multerConfig");
 
-router.post("/", Authenticate, AuthorizedSeller, createProduct);
+router.post(
+  "/",
+  Authenticate,
+  AuthorizedSeller,
+  upload.single("image"),
+  createProduct
+);
 router.get("/", getProducts);
 router.get("/:id", getSingleProduct);
 router.get("/category/:category", getCategoryProduct);

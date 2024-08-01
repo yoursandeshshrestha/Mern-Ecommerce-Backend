@@ -13,21 +13,11 @@ const {
   errorHandler,
 } = require("./middleware/erroMiddleware.js");
 
-if (!process.env.PORT) {
-  console.warn(
-    "Warning: PORT environment variable is not set. Defaulting to 5000."
-  );
-}
-
-const corsOptions = {
-  origin: "http://localhost:5173",
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use("/uploads", express.static("uploads"));
 
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);

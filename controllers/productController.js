@@ -24,7 +24,7 @@ const createProduct = async (req, res) => {
       price,
       oldPrice,
       stock,
-      image,
+      image: req.file.filename,
       size,
       color,
       seller: req.user._id,
@@ -50,7 +50,7 @@ const createProduct = async (req, res) => {
 
 const getProducts = async (req, res) => {
   try {
-    const products = await productModel.find();
+    const products = await productModel.find().sort({ createdAt: -1 });
     if (products.length === 0) {
       return res.status(404).json({ message: "No Products Found" });
     }
@@ -90,7 +90,9 @@ const getSingleProduct = async (req, res) => {
 const getCategoryProduct = async (req, res) => {
   try {
     const { category } = req.params;
-    const products = await productModel.find({ category: { $in: [category] } });
+    const products = await productModel
+      .find({ category: { $in: [category] } })
+      .sort({ createdAt: -1 });
     if (products.length === 0) {
       return res.status(404).json({
         success: false,

@@ -17,16 +17,91 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    isAdmin: {
-      type: Boolean,
+    accountType: {
+      type: String,
       required: true,
-      default: false,
+      enum: ["Customer", "Seller"],
+      default: "Customer",
+    },
+    cartDetails: [
+      {
+        productName: {
+          type: String,
+        },
+        price: {
+          mrp: {
+            type: Number,
+          },
+          cost: {
+            type: Number,
+          },
+          discountPercent: {
+            type: Number,
+          },
+        },
+        subcategory: {
+          type: String,
+        },
+        productImage: {
+          type: String,
+        },
+        category: {
+          type: String,
+        },
+        description: {
+          type: String,
+        },
+        tagline: {
+          type: String,
+        },
+        quantity: {
+          type: Number,
+        },
+      },
+    ],
+    shippingData: {
+      address: {
+        type: String,
+      },
+      city: {
+        type: String,
+      },
+      state: {
+        type: String,
+      },
+      country: {
+        type: String,
+      },
+      pinCode: {
+        type: Number,
+      },
+      phoneNo: {
+        type: Number,
+      },
+    },
+    shopName: {
+      type: String,
+      required: function () {
+        return this.accountType === "Seller";
+      },
+      unique: function () {
+        return this.accountType === "Seller";
+      },
     },
   },
   {
     timestamps: true,
   }
 );
+
+// Validate that cartDetails and shippingData are only required for Customers
+userSchema.pre("save", function (next) {
+  if (this.accountType === "Seller") {
+    this.cartDetails = undefined;
+    this.shippingData = undefined;
+  }
+  next();
+});
 
 const userModel = mongoose.model("User", userSchema);
 

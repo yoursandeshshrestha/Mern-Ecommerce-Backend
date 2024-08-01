@@ -8,7 +8,6 @@ require("./config/database.js");
 const userRoutes = require("./Routes/userRoutes");
 const productRoutes = require("./Routes/productRoutes");
 const verifyRoutes = require("./Routes/verifyRoutes");
-const sellerRoutes = require("./Routes/sellerRoutes");
 const {
   notFoundRoutes,
   errorHandler,
@@ -32,7 +31,6 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
-app.use("/api/seller", sellerRoutes);
 app.use("/api", verifyRoutes);
 
 app.use(notFoundRoutes);

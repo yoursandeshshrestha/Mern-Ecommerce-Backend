@@ -9,7 +9,7 @@ const generateToken = require("../utils/generateToken");
 
 const registerUser = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, email, password, accountType, shopName } = req.body;
 
     if (!username || !email || !password) {
       return res
@@ -32,13 +32,32 @@ const registerUser = async (req, res) => {
         .json({ success: false, message: "Password is too short" });
     }
 
+    if (accountType === "Seller") {
+      if (!shopName || shopName.trim() === "") {
+        return res.status(400).json({
+          success: false,
+          message: "Shop name is required for sellers",
+        });
+      }
+
+      const shopExist = await userModel.findOne({ shopName });
+      if (shopExist) {
+        return res
+          .status(409)
+          .json({ success: false, message: "Shop name already exists" });
+      }
+    }
+
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(password, salt);
 
+    // Create the new user
     const newUser = await userModel.create({
       username,
       email: normalizedEmail,
       password: hashPassword,
+      accountType,
+      shopName: accountType === "Seller" ? shopName : undefined,
     });
 
     generateToken(res, newUser);

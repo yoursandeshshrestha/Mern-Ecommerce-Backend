@@ -17,12 +17,12 @@ const Authenticate = async (req, res, next) => {
   }
 };
 
-const AuthorizedAdmin = (req, res, next) => {
-  if (req.user && req.user.isAdmin) {
+const AuthorizedSeller = (req, res, next) => {
+  if (req.user.accountType == "Seller") {
     next();
   } else {
-    res.status(401).json({ message: "Not Authorized as an admin" });
+    res.status(401).json({ message: "Only seller can list product" });
   }
 };
 
-module.exports = { Authenticate, AuthorizedAdmin };
+module.exports = { Authenticate, AuthorizedSeller };

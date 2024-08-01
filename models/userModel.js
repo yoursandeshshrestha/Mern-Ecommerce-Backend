@@ -94,7 +94,6 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Validate that cartDetails and shippingData are only required for Customers
 userSchema.pre("save", function (next) {
   if (this.accountType === "Seller") {
     this.cartDetails = undefined;

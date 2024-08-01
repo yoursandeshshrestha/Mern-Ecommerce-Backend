@@ -14,7 +14,7 @@ const {
 
 const {
   Authenticate,
-  AuthorizedAdmin,
+  AuthorizedSeller,
 } = require("../middleware/authMiddleware");
 
 // User routes
@@ -28,7 +28,7 @@ router.put("/profile", Authenticate, updateCurrentUserProfile);
 router.delete("/profile", Authenticate, deleteCurrentUserProfile);
 
 // Admin
-router.get("/", Authenticate, AuthorizedAdmin, getAllUsers);
-router.delete("/:id", Authenticate, AuthorizedAdmin, deleteUserByAdmin);
+// router.get("/", Authenticate, AuthorizedAdmin, getAllUsers);
+// router.delete("/:id", Authenticate, AuthorizedAdmin, deleteUserByAdmin);
 
 module.exports = router;

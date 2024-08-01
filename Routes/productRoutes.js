@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const authMiddleware = require("../middleware/authMiddleware");
+const {
+  AuthorizedSeller,
+  Authenticate,
+} = require("../middleware/authMiddleware");
 const {
   createProduct,
   getProducts,
@@ -8,7 +11,7 @@ const {
   getCategoryProduct,
 } = require("../controllers/productController");
 
-router.post("/", createProduct);
+router.post("/", Authenticate, AuthorizedSeller, createProduct);
 router.get("/", getProducts);
 router.get("/:id", getSingleProduct);
 router.get("/category/:category", getCategoryProduct);

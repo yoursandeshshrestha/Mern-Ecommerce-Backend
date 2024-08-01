@@ -6,16 +6,29 @@ const productModel = require("../models/productModel");
 
 const createProduct = async (req, res) => {
   try {
-    const { name, description, brand, category, price, stock, image } =
-      req.body;
+    const {
+      name,
+      description,
+      category,
+      price,
+      oldPrice,
+      stock,
+      image,
+      size,
+      color,
+    } = req.body;
     const product = await productModel.create({
       name,
       description,
-      brand,
       category,
       price,
+      oldPrice,
       stock,
       image,
+      size,
+      color,
+      seller: req.user._id,
+      shopName: req.user.shopName,
     });
     res.status(201).json({
       success: true,

@@ -101,13 +101,13 @@ const loginUser = async (req, res) => {
 
     const token = generateToken(res, user);
 
-    const { _id, username, email: userEmail, isAdmin } = user;
+    const { _id, username, email: userEmail, accountType } = user;
     res.status(200).json({
       success: true,
       id: _id,
       username,
       email: userEmail,
-      isAdmin,
+      accountType,
       token,
     });
   } catch (error) {

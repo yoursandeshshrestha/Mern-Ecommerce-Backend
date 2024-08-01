@@ -10,20 +10,20 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: [true, "Product description is required"],
     },
-    brand: {
-      type: String,
-      required: [true, "Product brand is required"],
-    },
-    category: {
-      type: [String],
-      default: ["Uncategorized"],
-      required: true,
-    },
+    category: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
     price: {
       type: Number,
       required: [true, "Product price is required"],
       default: 0,
       min: [0, "Product price cannot be negative"],
+    },
+    oldPrice: {
+      type: Number,
     },
     stock: {
       type: Number,
@@ -34,6 +34,22 @@ const productSchema = new mongoose.Schema(
     image: {
       type: String,
       required: [true, "Product image is required"],
+    },
+    size: {
+      type: String,
+      required: [true, "Product size is required"],
+    },
+    color: {
+      type: String,
+      required: [true, "Product color is required"],
+    },
+    seller: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    shopName: {
+      type: String,
+      required: true,
     },
   },
   { timestamps: true }

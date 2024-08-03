@@ -35,14 +35,18 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: [true, "Product image is required"],
     },
-    size: {
-      type: String,
-      required: [true, "Product size is required"],
-    },
-    color: {
-      type: String,
-      required: [true, "Product color is required"],
-    },
+    size: [
+      {
+        type: String,
+        required: [true, "Product size is required"],
+      },
+    ],
+    color: [
+      {
+        type: String,
+        required: [true, "Product color is required"],
+      },
+    ],
     seller: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

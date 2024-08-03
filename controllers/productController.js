@@ -6,36 +6,56 @@ const productModel = require("../models/productModel");
 
 const createProduct = async (req, res) => {
   try {
-    const {
+    const { name, description, category, price, oldPrice, stock, size } =
+      req.body;
+    const image = req.file?.filename;
+
+    // Check for missing fields
+    if (
+      !name ||
+      !description ||
+      !category ||
+      !price ||
+      !stock ||
+      !image ||
+      !size
+    ) {
+      return res.status(400).json({ message: "Fill in all fields" });
+    }
+
+    // Parse JSON fields
+    let parsedCategory;
+    let parsedSize;
+    try {
+      parsedCategory = JSON.parse(category);
+      parsedSize = JSON.parse(size);
+    } catch (err) {
+      return res
+        .status(400)
+        .json({ message: "Invalid format for category or size" });
+    }
+
+    // Create the product
+    const product = await productModel.create({
       name,
       description,
-      category,
+      category: parsedCategory,
       price,
       oldPrice,
       stock,
       image,
-      size,
-      color,
-    } = req.body;
-    const product = await productModel.create({
-      name,
-      description,
-      category,
-      price,
-      oldPrice,
-      stock,
-      image: req.file.filename,
-      size,
-      color,
+      size: parsedSize,
       seller: req.user._id,
       shopName: req.user.shopName,
     });
+
     res.status(201).json({
       success: true,
       message: "Product Created Successfully",
       product,
     });
   } catch (error) {
+    console.error("Error creating product:", error);
     res.status(500).json({
       success: false,
       message: "Error Creating Product, please try again later",

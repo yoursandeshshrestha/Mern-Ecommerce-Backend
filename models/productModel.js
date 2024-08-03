@@ -10,12 +10,10 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: [true, "Product description is required"],
     },
-    category: [
-      {
-        type: String,
-        required: true,
-      },
-    ],
+    category: {
+      type: Array,
+      required: true,
+    },
     price: {
       type: Number,
       required: [true, "Product price is required"],
@@ -35,18 +33,10 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: [true, "Product image is required"],
     },
-    size: [
-      {
-        type: String,
-        required: [true, "Product size is required"],
-      },
-    ],
-    color: [
-      {
-        type: String,
-        required: [true, "Product color is required"],
-      },
-    ],
+    size: {
+      type: Array,
+      required: [true, "Product size is required"],
+    },
     seller: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

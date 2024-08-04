@@ -189,10 +189,29 @@ const getCurrentUserProfile = async (req, res) => {
 
 const updateCurrentUserProfile = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, shopName, email, password, currentPassword } = req.body;
+
+    // Get user from the database
+    const user = await userModel.findById(req.user.id);
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    // Check if the current password is correct
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Current password is incorrect" });
+    }
+
     const update = {};
 
     if (username) update.username = username;
+    if (shopName) update.shopName = shopName;
 
     if (email) {
       update.email = email.toLowerCase();
@@ -214,22 +233,16 @@ const updateCurrentUserProfile = async (req, res) => {
       update.password = await bcrypt.hash(password, salt);
     }
 
-    const user = await userModel.findByIdAndUpdate(req.user.id, update, {
+    const updatedUser = await userModel.findByIdAndUpdate(req.user.id, update, {
       new: true,
       runValidators: true,
     });
 
-    if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
-    }
-
     res.status(200).json({
       success: true,
-      id: user._id,
-      username: user.username,
-      email: user.email,
+      id: updatedUser._id,
+      username: updatedUser.username,
+      email: updatedUser.email,
     });
   } catch (error) {
     console.error("Error updating user profile:", error);

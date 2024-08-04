@@ -139,13 +139,12 @@ const getCategoryProduct = async (req, res) => {
 const productBySellerID = async (req, res) => {
   try {
     const { sellerID } = req.params;
-    const data = await productModel.find({ seller: sellerID });
-    console.log(data);
-    if (data.length === 0) {
+    const product = await productModel.find({ seller: sellerID });
+    if (product.length === 0) {
       return res.status(404).json({ message: "No products found" });
     }
 
-    res.status(200).json({ message: "success", data });
+    res.status(200).json({ message: "success", product });
   } catch (error) {
     res.status(500).json({
       message: "Error Fetching Products, please try again later",

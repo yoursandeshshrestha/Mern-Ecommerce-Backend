@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const productModel = require("../models/productModel");
 
 // ======================== Create Product ==================== //
@@ -139,7 +141,9 @@ const getCategoryProduct = async (req, res) => {
 const productBySellerID = async (req, res) => {
   try {
     const { sellerID } = req.params;
-    const product = await productModel.find({ seller: sellerID });
+    const product = await productModel
+      .find({ seller: sellerID })
+      .sort({ createdAt: -1 });
     if (product.length === 0) {
       return res.status(404).json({ message: "No products found" });
     }
@@ -153,10 +157,39 @@ const productBySellerID = async (req, res) => {
   }
 };
 
+// ======================== Delete Product by ID ==================== //
+// ==== GET : api/products/:id
+// ==== UNPROTECTED
+
+const deleteProductByID = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const product = await productModel.findById({ _id: id });
+    if (!product) {
+      res.status(404).json({ message: "Product Not Found" });
+    }
+    const imagePath = path.join(__dirname, "..", "uploads", product.image);
+    await productModel.findOneAndDelete({ _id: id });
+    fs.unlink(imagePath, (err) => {
+      if (err) {
+        console.error("Error deleting image:", err);
+      }
+    });
+
+    res.status(200).json({ message: "Product Removed Successfully" });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error Deleting Product, please try again later",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createProduct,
   getProducts,
   getSingleProduct,
   getCategoryProduct,
   productBySellerID,
+  deleteProductByID,
 };

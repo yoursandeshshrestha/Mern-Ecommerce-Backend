@@ -1,7 +1,9 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/userModel");
+const productModel = require("../models/productModel");
 const generateToken = require("../utils/generateToken");
+const mongoose = require("mongoose");
 
 // ======================== Register User ==================== //
 // ==== POST : api/users/register
@@ -314,6 +316,117 @@ const deleteUserByAdmin = async (req, res) => {
   }
 };
 
+const addToCart = async (req, res) => {
+  const {
+    userId,
+    productID,
+    productName,
+    productPrice,
+    productQuantity,
+    productImage,
+  } = req.body;
+
+  try {
+    if (
+      !userId ||
+      !productID ||
+      !productName ||
+      !productPrice ||
+      !productQuantity ||
+      !productImage
+    ) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+    const user = await userModel.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const existingProduct = user.cartDetails.find(
+      (item) => item.productID === productID
+    );
+
+    if (existingProduct) {
+      existingProduct.productQuantity += productQuantity;
+    } else {
+      user.cartDetails.push({
+        productID,
+        productQuantity,
+        productName,
+        productPrice,
+        productImage,
+      });
+    }
+    await user.save();
+    res.status(200).json({
+      message: "Product added to cart successfully",
+      cartDetails: user.cartDetails,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Update cart item quantity
+const updateCartQuantity = async (req, res) => {
+  const { userId, productID, quantityChange } = req.body;
+
+  try {
+    const user = await userModel.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const product = user.cartDetails.find(
+      (item) => item.productID === productID
+    );
+
+    if (product) {
+      product.productQuantity += quantityChange;
+
+      // Ensure the quantity doesn't go below 1
+      if (product.productQuantity < 1) {
+        product.productQuantity = 1;
+      }
+
+      await user.save();
+      return res.status(200).json({
+        message: "Product quantity updated successfully",
+        cartDetails: user.cartDetails,
+      });
+    } else {
+      return res.status(404).json({ message: "Product not found in cart" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const removeFromCart = async (req, res) => {
+  const { userId, productID } = req.body;
+
+  try {
+    const user = await userModel.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.cartDetails = user.cartDetails.filter(
+      (item) => item.productID.toString() !== productID.toString()
+    );
+
+    await user.save();
+    res.status(200).json({
+      message: "Product removed from cart successfully",
+      cartDetails: user.cartDetails,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -323,4 +436,7 @@ module.exports = {
   updateCurrentUserProfile,
   deleteCurrentUserProfile,
   deleteUserByAdmin,
+  addToCart,
+  updateCartQuantity,
+  removeFromCart,
 };

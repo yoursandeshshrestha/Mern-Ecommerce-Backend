@@ -10,6 +10,9 @@ const {
   updateCurrentUserProfile,
   deleteCurrentUserProfile,
   deleteUserByAdmin,
+  addToCart,
+  updateCartQuantity,
+  removeFromCart,
 } = require("../controllers/userController");
 
 const {
@@ -31,4 +34,8 @@ router.delete("/profile", Authenticate, deleteCurrentUserProfile);
 // router.get("/", Authenticate, AuthorizedAdmin, getAllUsers);
 // router.delete("/:id", Authenticate, AuthorizedAdmin, deleteUserByAdmin);
 
+//cart
+router.post("/cart/add", addToCart);
+router.post("/cart/update-quantity", updateCartQuantity);
+router.post("/cart/remove", removeFromCart);
 module.exports = router;

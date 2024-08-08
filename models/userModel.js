@@ -25,36 +25,19 @@ const userSchema = new mongoose.Schema(
     },
     cartDetails: [
       {
+        productID: {
+          type: String,
+        },
         productName: {
           type: String,
         },
-        price: {
-          mrp: {
-            type: Number,
-          },
-          cost: {
-            type: Number,
-          },
-          discountPercent: {
-            type: Number,
-          },
-        },
-        subcategory: {
-          type: String,
+        productPrice: {
+          type: Number,
         },
         productImage: {
           type: String,
         },
-        category: {
-          type: String,
-        },
-        description: {
-          type: String,
-        },
-        tagline: {
-          type: String,
-        },
-        quantity: {
+        productQuantity: {
           type: Number,
         },
       },

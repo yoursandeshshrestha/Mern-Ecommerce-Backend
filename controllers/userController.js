@@ -203,6 +203,12 @@ const updateCurrentUserProfile = async (req, res) => {
     }
 
     // Check if the current password is correct
+    if (!currentPassword) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Password is required" });
+    }
+
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
       return res

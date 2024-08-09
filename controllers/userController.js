@@ -253,7 +253,6 @@ const updateCurrentUserProfile = async (req, res) => {
       email: updatedUser.email,
     });
   } catch (error) {
-    console.error("Error updating user profile:", error);
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -283,7 +282,6 @@ const deleteCurrentUserProfile = async (req, res) => {
     await userModel.findByIdAndDelete(userId);
     res.status(204).json({ message: "Account Deleted Successfully" });
   } catch (error) {
-    console.error("Error deleting user profile:", error);
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -313,7 +311,6 @@ const deleteUserByAdmin = async (req, res) => {
     await userModel.findByIdAndDelete(id);
     res.status(204).send();
   } catch (error) {
-    console.error("Error deleting user:", error);
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -433,6 +430,43 @@ const removeFromCart = async (req, res) => {
   }
 };
 
+const updateCurrentUserAddress = async (req, res) => {
+  try {
+    const { address, city, state, pinCode, phoneNo, country } = req.body;
+
+    const user = await userModel.findById(req.user.id);
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    user.shippingData = {
+      address,
+      city,
+      state,
+      pinCode,
+      phoneNo,
+      country,
+    };
+
+    const updatedUser = await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Address updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -445,4 +479,5 @@ module.exports = {
   addToCart,
   updateCartQuantity,
   removeFromCart,
+  updateCurrentUserAddress,
 };

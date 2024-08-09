@@ -13,6 +13,7 @@ const {
   addToCart,
   updateCartQuantity,
   removeFromCart,
+  updateCurrentUserAddress,
 } = require("../controllers/userController");
 
 const {
@@ -29,6 +30,7 @@ router.post("/logout", logoutUser);
 router.get("/profile", Authenticate, getCurrentUserProfile);
 router.put("/profile", Authenticate, updateCurrentUserProfile);
 router.delete("/profile", Authenticate, deleteCurrentUserProfile);
+router.put("/profile/address", Authenticate, updateCurrentUserAddress);
 
 // Admin
 // router.get("/", Authenticate, AuthorizedAdmin, getAllUsers);

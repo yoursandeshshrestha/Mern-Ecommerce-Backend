@@ -40,6 +40,13 @@ const userSchema = new mongoose.Schema(
         productQuantity: {
           type: Number,
         },
+        seller: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        shopName: {
+          type: String,
+        },
       },
     ],
     shippingData: {

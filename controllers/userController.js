@@ -327,6 +327,8 @@ const addToCart = async (req, res) => {
     productPrice,
     productQuantity,
     productImage,
+    sellerId, // New: Adding sellerId
+    shopName, // New: Adding shopName
   } = req.body;
 
   try {
@@ -340,11 +342,14 @@ const addToCart = async (req, res) => {
     ) {
       return res.status(400).json({ message: "Missing required fields" });
     }
+
     const user = await userModel.findById(userId);
+    const product = await productModel.findById(productID);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+
     const existingProduct = user.cartDetails.find(
       (item) => item.productID === productID
     );
@@ -358,14 +363,19 @@ const addToCart = async (req, res) => {
         productName,
         productPrice,
         productImage,
+        seller: product.seller,
+        shopName: product.shopName,
       });
     }
+
     await user.save();
+
     res.status(200).json({
       message: "Product added to cart successfully",
       cartDetails: user.cartDetails,
     });
   } catch (error) {
+    console.error("Error adding product to cart:", error);
     res.status(500).json({ message: "Server error" });
   }
 };

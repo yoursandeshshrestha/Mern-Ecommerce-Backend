@@ -56,6 +56,12 @@ const orderSchema = new mongoose.Schema({
       shopName: {
         type: String,
       },
+      orderStatus: {
+        type: String,
+        required: true,
+        enum: ["Processing", "Shipped", "Delivered", "Cancelled"],
+        default: "Processing",
+      },
     },
   ],
   paymentInfo: {
@@ -87,12 +93,6 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     required: true,
     default: 0,
-  },
-  orderStatus: {
-    type: String,
-    required: true,
-    enum: ["Processing", "Shipped", "Delivered", "Cancelled"],
-    default: "Processing",
   },
   deliveredAt: Date,
   createdAt: {

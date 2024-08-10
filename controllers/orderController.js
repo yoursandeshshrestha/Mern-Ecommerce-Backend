@@ -29,6 +29,20 @@ const newOrder = async (req, res) => {
   }
 };
 
+const getOrderedProductsByCustomer = async (req, res) => {
+  try {
+    const product = await orderModel.findOne({ buyer: req.user.id });
+    if (product) {
+      res.status(200).json(product);
+    } else {
+      res.status(402).json({ message: "No Product Found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   newOrder,
+  getOrderedProductsByCustomer,
 };

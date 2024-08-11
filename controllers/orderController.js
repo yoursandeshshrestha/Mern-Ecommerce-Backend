@@ -44,7 +44,7 @@ const getOrderedProductsByCustomer = async (req, res) => {
 
 const getOrderedProductsBySeller = async (req, res) => {
   try {
-    const sellerId = req.params.id;
+    const sellerId = req.user.id;
 
     // Finding all orders containing products sold by the seller //
     const orders = await orderModel.find({
@@ -77,8 +77,32 @@ const getOrderedProductsBySeller = async (req, res) => {
   }
 };
 
+const updateOrderStatus = async (req, res) => {
+  try {
+    const { orderId, productId, newStatus } = req.body;
+
+    const order = await orderModel.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    const product = order.orderedProducts.id(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found in order" });
+    }
+
+    product.orderStatus = newStatus;
+    await order.save();
+
+    res.status(200).json({ message: "Order status updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   newOrder,
   getOrderedProductsByCustomer,
   getOrderedProductsBySeller,
+  updateOrderStatus,
 };

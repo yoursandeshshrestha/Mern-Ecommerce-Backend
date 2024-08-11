@@ -31,7 +31,7 @@ const newOrder = async (req, res) => {
 
 const getOrderedProductsByCustomer = async (req, res) => {
   try {
-    const product = await orderModel.findOne({ buyer: req.user.id });
+    const product = await orderModel.find({ buyer: req.user.id });
     if (product) {
       res.status(200).json(product);
     } else {

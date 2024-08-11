@@ -28,6 +28,9 @@ const orderSchema = new mongoose.Schema({
   },
   orderedProducts: [
     {
+      productID: {
+        type: String,
+      },
       productName: {
         type: String,
       },

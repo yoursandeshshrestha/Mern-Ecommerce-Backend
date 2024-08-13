@@ -8,8 +8,16 @@ const productModel = require("../models/productModel");
 
 const createProduct = async (req, res) => {
   try {
-    const { name, description, category, price, oldPrice, stock, size } =
-      req.body;
+    const {
+      name,
+      description,
+      category,
+      price,
+      oldPrice,
+      stock,
+      size,
+      gender,
+    } = req.body;
     const image = req.file?.filename;
 
     // Check for missing fields
@@ -20,7 +28,8 @@ const createProduct = async (req, res) => {
       !price ||
       !stock ||
       !image ||
-      !size
+      !size ||
+      !gender
     ) {
       return res.status(400).json({ message: "Fill in all fields" });
     }
@@ -49,6 +58,7 @@ const createProduct = async (req, res) => {
       size: parsedSize,
       seller: req.user._id,
       shopName: req.user.shopName,
+      gender,
     });
 
     res.status(201).json({
@@ -143,7 +153,7 @@ const productBySellerID = async (req, res) => {
     const { sellerID } = req.params;
     const product = await productModel
       .find({ seller: sellerID })
-      .sort({ createdAt: -1 });
+      .sort({ updatedAt: -1 });
     if (product.length === 0) {
       return res.status(404).json({ message: "No products found" });
     }
@@ -203,6 +213,18 @@ const editProductByID = async (req, res) => {
       gender,
     } = req.body;
     const image = req.file?.filename;
+
+    if (
+      !name ||
+      !description ||
+      !category ||
+      !price ||
+      !stock ||
+      !size ||
+      !gender
+    ) {
+      return res.status(402).json({ message: "Fill in all fields" });
+    }
 
     // Find the product by ID
     const product = await productModel.findById(productID);

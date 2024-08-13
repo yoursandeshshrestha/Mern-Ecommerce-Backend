@@ -192,18 +192,29 @@ const deleteProductByID = async (req, res) => {
 const editProductByID = async (req, res) => {
   try {
     const productID = req.params.id;
-    const { name, description, category, price, oldPrice, stock, size } =
-      req.body;
+    const {
+      name,
+      description,
+      category,
+      price,
+      oldPrice,
+      stock,
+      size,
+      gender,
+    } = req.body;
     const image = req.file?.filename;
 
-    const product = await productModel.findOne({ _id: productID });
+    // Find the product by ID
+    const product = await productModel.findById(productID);
     if (!product) {
       return res.status(404).json({ message: "Product Not Found" });
     }
 
+    // Handle image replacement
     if (image) {
       const oldImagePath = path.join(__dirname, "../uploads/", product.image);
 
+      // Check if old image exists and delete it
       if (fs.existsSync(oldImagePath)) {
         fs.unlink(oldImagePath, (err) => {
           if (err) {
@@ -212,17 +223,32 @@ const editProductByID = async (req, res) => {
         });
       }
 
+      // Update product image
       product.image = image;
     }
 
+    // Parse category and size fields if they are JSON strings
+    let parsedCategory, parsedSize;
+    try {
+      parsedCategory = category ? JSON.parse(category) : product.category;
+      parsedSize = size ? JSON.parse(size) : product.size;
+    } catch (err) {
+      return res
+        .status(400)
+        .json({ message: "Invalid format for category or size" });
+    }
+
+    // Update product fields
     product.name = name || product.name;
     product.description = description || product.description;
-    product.category = category || product.category;
+    product.category = parsedCategory;
     product.price = price || product.price;
     product.oldPrice = oldPrice || product.oldPrice;
     product.stock = stock || product.stock;
-    product.size = size || product.size;
+    product.size = parsedSize || product.size;
+    product.gender = gender || product.gender;
 
+    // Save the updated product
     await product.save();
 
     res.status(200).json({ message: "Product updated successfully", product });

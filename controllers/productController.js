@@ -185,6 +185,55 @@ const deleteProductByID = async (req, res) => {
   }
 };
 
+// ======================== Edit Product by ID ==================== //
+// ==== PUT : api/products/:id
+// ==== PROTECTED
+
+const editProductByID = async (req, res) => {
+  try {
+    const productID = req.params.id;
+    const { name, description, category, price, oldPrice, stock, size } =
+      req.body;
+    const image = req.file?.filename;
+
+    const product = await productModel.findOne({ _id: productID });
+    if (!product) {
+      return res.status(404).json({ message: "Product Not Found" });
+    }
+
+    if (image) {
+      const oldImagePath = path.join(__dirname, "../uploads/", product.image);
+
+      if (fs.existsSync(oldImagePath)) {
+        fs.unlink(oldImagePath, (err) => {
+          if (err) {
+            console.error("Error deleting old image:", err);
+          }
+        });
+      }
+
+      product.image = image;
+    }
+
+    product.name = name || product.name;
+    product.description = description || product.description;
+    product.category = category || product.category;
+    product.price = price || product.price;
+    product.oldPrice = oldPrice || product.oldPrice;
+    product.stock = stock || product.stock;
+    product.size = size || product.size;
+
+    await product.save();
+
+    res.status(200).json({ message: "Product updated successfully", product });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error updating product, please try again later",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createProduct,
   getProducts,
@@ -192,4 +241,5 @@ module.exports = {
   getCategoryProduct,
   productBySellerID,
   deleteProductByID,
+  editProductByID,
 };

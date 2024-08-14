@@ -327,8 +327,7 @@ const addToCart = async (req, res) => {
     productPrice,
     productQuantity,
     productImage,
-    sellerId, // New: Adding sellerId
-    shopName, // New: Adding shopName
+    productSize,
   } = req.body;
 
   try {
@@ -338,7 +337,8 @@ const addToCart = async (req, res) => {
       !productName ||
       !productPrice ||
       !productQuantity ||
-      !productImage
+      !productImage ||
+      !productSize
     ) {
       return res.status(400).json({ message: "Missing required fields" });
     }
@@ -350,8 +350,9 @@ const addToCart = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Check if the product with the same ID and size exists in the cart
     const existingProduct = user.cartDetails.find(
-      (item) => item.productID === productID
+      (item) => item.productID === productID && item.productSize === productSize
     );
 
     if (existingProduct) {
@@ -363,6 +364,7 @@ const addToCart = async (req, res) => {
         productName,
         productPrice,
         productImage,
+        productSize,
         seller: product.seller,
         shopName: product.shopName,
       });
@@ -380,7 +382,6 @@ const addToCart = async (req, res) => {
   }
 };
 
-// Update cart item quantity
 const updateCartQuantity = async (req, res) => {
   const { userId, productID, quantityChange } = req.body;
 
@@ -398,7 +399,6 @@ const updateCartQuantity = async (req, res) => {
     if (product) {
       product.productQuantity += quantityChange;
 
-      // Ensure the quantity doesn't go below 1
       if (product.productQuantity < 1) {
         product.productQuantity = 1;
       }

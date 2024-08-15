@@ -12,6 +12,7 @@ const {
   productBySellerID,
   deleteProductByID,
   editProductByID,
+  searchProducts,
 } = require("../controllers/productController");
 const upload = require("../config/multerConfig");
 
@@ -22,6 +23,10 @@ router.post(
   upload.single("image"),
   createProduct
 );
+
+// Advance Search
+router.get("/search", searchProducts);
+
 router.get("/", getProducts);
 router.get("/:id", getSingleProduct);
 router.get("/category/:category", getCategoryProduct);

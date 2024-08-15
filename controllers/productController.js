@@ -292,6 +292,30 @@ const editProductByID = async (req, res) => {
   }
 };
 
+const searchProducts = async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    const products = await productModel.find({
+      $or: [
+        { name: { $regex: query, $options: "i" } },
+        { category: { $regex: query, $options: "i" } },
+      ],
+    });
+
+    if (products.length === 0) {
+      return res.status(404).json({ message: "No Products Found" });
+    }
+
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error Fetching Product, please try again later",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createProduct,
   getProducts,
@@ -300,4 +324,5 @@ module.exports = {
   productBySellerID,
   deleteProductByID,
   editProductByID,
+  searchProducts,
 };

@@ -82,12 +82,15 @@ const createProduct = async (req, res) => {
 
 const getProducts = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
-  const limit = 10;
+  const limit = parseInt(req.query.limit);
   const skip = (page - 1) * limit;
+  const discounted = req.query.discounted === "true";
 
   try {
+    const query = discounted ? { oldPrice: { $ne: null } } : {};
+
     const products = await productModel
-      .find()
+      .find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -99,7 +102,7 @@ const getProducts = async (req, res) => {
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({
-      message: "Error Fetching Product, please try again later",
+      message: "Error Fetching Products, please try again later",
       error: error.message,
     });
   }
@@ -275,7 +278,9 @@ const editProductByID = async (req, res) => {
     product.description = description || product.description;
     product.category = parsedCategory;
     product.price = price || product.price;
-    product.oldPrice = oldPrice || product.oldPrice;
+    if (!product.oldPrice === null) {
+      product.oldPrice = oldPrice || product.oldPrice;
+    }
     product.stock = stock || product.stock;
     product.size = parsedSize || product.size;
     product.gender = gender || product.gender;
@@ -294,14 +299,22 @@ const editProductByID = async (req, res) => {
 
 const searchProducts = async (req, res) => {
   try {
-    const { query } = req.query;
+    const { query, limit } = req.query;
 
-    const products = await productModel.find({
+    // Build the base query
+    let productQuery = productModel.find({
       $or: [
         { name: { $regex: query, $options: "i" } },
         { category: { $regex: query, $options: "i" } },
       ],
     });
+
+    // Apply limit only if provided
+    if (limit) {
+      productQuery = productQuery.limit(parseInt(limit));
+    }
+
+    const products = await productQuery;
 
     if (products.length === 0) {
       return res.status(404).json({ message: "No Products Found" });

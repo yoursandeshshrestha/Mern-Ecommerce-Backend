@@ -81,11 +81,21 @@ const createProduct = async (req, res) => {
 // ==== UNPROTECTED
 
 const getProducts = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = 10;
+  const skip = (page - 1) * limit;
+
   try {
-    const products = await productModel.find().sort({ createdAt: -1 });
+    const products = await productModel
+      .find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
     if (products.length === 0) {
       return res.status(404).json({ message: "No Products Found" });
     }
+
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({

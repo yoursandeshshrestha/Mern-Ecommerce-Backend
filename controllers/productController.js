@@ -1,7 +1,6 @@
 const fs = require("fs");
 const path = require("path");
 const productModel = require("../models/productModel");
-const notifySubscribers = require("../Utils/notifySubscribers");
 
 // ======================== Create Product ==================== //
 // ==== POST : api/products

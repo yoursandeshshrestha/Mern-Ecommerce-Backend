@@ -9,6 +9,7 @@ const userRoutes = require("./Routes/userRoutes");
 const productRoutes = require("./Routes/productRoutes");
 const verifyRoutes = require("./Routes/verifyRoutes");
 const orderRoutes = require("./Routes/orderRoutes");
+const subscribeRoutes = require("./Routes/subscribeRoute.js");
 const {
   notFoundRoutes,
   errorHandler,
@@ -33,6 +34,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/order", orderRoutes);
 app.use("/api", verifyRoutes);
+app.use("/api/subscribe", subscribeRoutes);
 
 app.use(notFoundRoutes);
 app.use(errorHandler);

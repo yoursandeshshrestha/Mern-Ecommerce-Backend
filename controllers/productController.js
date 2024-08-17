@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const productModel = require("../models/productModel");
+const notifySubscribers = require("../Utils/notifySubscribers");
 
 // ======================== Create Product ==================== //
 // ==== POST : api/products
@@ -20,7 +21,6 @@ const createProduct = async (req, res) => {
     } = req.body;
     const image = req.file?.filename;
 
-    // Check for missing fields
     if (
       !name ||
       !description ||
@@ -28,10 +28,14 @@ const createProduct = async (req, res) => {
       !price ||
       !stock ||
       !image ||
-      !size ||
-      !gender
+      !size
     ) {
       return res.status(400).json({ message: "Fill in all fields" });
+    }
+
+    const validGenders = ["Men", "Women", "Unisex"];
+    if (!validGenders.includes(gender)) {
+      return res.status(400).json({ message: "Please select gender" });
     }
 
     // Parse JSON fields
@@ -46,7 +50,6 @@ const createProduct = async (req, res) => {
         .json({ message: "Invalid format for category or size" });
     }
 
-    // Create the product
     const product = await productModel.create({
       name,
       description,
@@ -61,9 +64,10 @@ const createProduct = async (req, res) => {
       gender,
     });
 
+    // await notifySubscribers(name); // Not Working thats why commented out
     res.status(201).json({
       success: true,
-      message: "Product Created Successfully",
+      message: "Product Created Successfully and subscribers notified!",
       product,
     });
   } catch (error) {

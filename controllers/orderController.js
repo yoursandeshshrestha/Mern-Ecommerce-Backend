@@ -1,5 +1,6 @@
 const orderModel = require("../models/orderModel");
 const userModel = require("../models/userModel");
+const productModel = require("../models/productModel");
 
 const newOrder = async (req, res) => {
   try {
@@ -21,8 +22,16 @@ const newOrder = async (req, res) => {
       productsQuantity,
       totalPrice,
     });
-    await userModel.findByIdAndUpdate(buyer, { cartDetails: [] });
 
+    for (const item of orderedProducts) {
+      const product = await productModel.findById(item.productID);
+      if (product) {
+        product.stock = product.stock - item.quantity;
+        await product.save();
+      }
+    }
+
+    await userModel.findByIdAndUpdate(buyer, { cartDetails: [] });
     return res.status(200).json({ message: "Order Successful" });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -46,7 +55,6 @@ const getOrderedProductsBySeller = async (req, res) => {
   try {
     const sellerId = req.user.id;
 
-    // Finding all orders containing products sold by the seller //
     const orders = await orderModel.find({
       "orderedProducts.seller": sellerId,
     });
@@ -58,11 +66,10 @@ const getOrderedProductsBySeller = async (req, res) => {
         (product) => product.seller.toString() === sellerId.toString()
       );
 
-      // If there are matching products then add the order to the results
       if (filteredProducts.length > 0) {
         filteredOrders.push({
-          ...order._doc, // Copy all order fields
-          orderedProducts: filteredProducts, // Replace orderedProducts with the filtered ones
+          ...order._doc,
+          orderedProducts: filteredProducts,
         });
       }
     }

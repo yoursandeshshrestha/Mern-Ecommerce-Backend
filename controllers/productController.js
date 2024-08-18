@@ -88,9 +88,18 @@ const getProducts = async (req, res) => {
   const limit = parseInt(req.query.limit);
   const skip = (page - 1) * limit;
   const discounted = req.query.discounted === "true";
+  const gender = req.query.gender; // Extract gender from query
 
   try {
-    const query = discounted ? { oldPrice: { $ne: null } } : {};
+    const query = {};
+
+    if (discounted) {
+      query.oldPrice = { $ne: null };
+    }
+
+    if (gender) {
+      query.gender = gender; // Add gender filter to the query
+    }
 
     const products = await productModel
       .find(query)
@@ -98,9 +107,9 @@ const getProducts = async (req, res) => {
       .skip(skip)
       .limit(limit);
 
-    if (products.length === 0) {
-      return res.status(404).json({ message: "No Products Found" });
-    }
+    // if (products.length === 0) {
+    //   return res.status(404).json(pro);
+    // }
 
     res.status(200).json(products);
   } catch (error) {

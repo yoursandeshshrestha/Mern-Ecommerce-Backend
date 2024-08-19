@@ -88,7 +88,12 @@ const getProducts = async (req, res) => {
   const limit = parseInt(req.query.limit);
   const skip = (page - 1) * limit;
   const discounted = req.query.discounted === "true";
-  const gender = req.query.gender; // Extract gender from query
+  const gender = req.query.gender;
+  const sortBy = req.query.sortBy || "createdAt";
+  const order = req.query.order === "asc" ? 1 : -1;
+  const size = req.query.size ? req.query.size.split(",") : null;
+  const minPrice = parseFloat(req.query.minPrice);
+  const maxPrice = parseFloat(req.query.maxPrice);
 
   try {
     const query = {};
@@ -98,20 +103,38 @@ const getProducts = async (req, res) => {
     }
 
     if (gender) {
-      query.gender = gender; // Add gender filter to the query
+      query.gender = gender;
     }
 
+    if (size) {
+      query.size = { $in: size };
+    }
+
+    if (!isNaN(minPrice) || !isNaN(maxPrice)) {
+      query.price = {};
+      if (!isNaN(minPrice)) {
+        query.price.$gte = minPrice;
+      }
+      if (!isNaN(maxPrice)) {
+        query.price.$lte = maxPrice;
+      }
+    }
+
+    // Count the total number of products that match the query
+    const totalProducts = await productModel.countDocuments(query);
+
+    // Fetch the paginated products
     const products = await productModel
       .find(query)
-      .sort({ createdAt: -1 })
+      .sort({ [sortBy]: order })
       .skip(skip)
       .limit(limit);
 
-    // if (products.length === 0) {
-    //   return res.status(404).json(pro);
-    // }
-
-    res.status(200).json(products);
+    // Return both the products and the total count
+    res.status(200).json({
+      products,
+      totalProducts, // Include totalProducts in the response
+    });
   } catch (error) {
     res.status(500).json({
       message: "Error Fetching Products, please try again later",
